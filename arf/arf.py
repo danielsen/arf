@@ -37,7 +37,7 @@ class ARFMessage(object):
         return "".join(next(c)(x) for x in field.split("-"))
 
     def _clean_field_value(self, field_value):
-        return field_value.replace("\n", "").replace("\t", " ")
+        return field_value.replace('\n', '').replace('\t', ' ')
 
     def _serialize_headers(self, source_headers):
         target_headers = {}
