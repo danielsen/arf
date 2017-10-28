@@ -1,57 +1,124 @@
-""" arf.py - Class abstract for representing ARFs as defined in RFC5965
-	http://www.faqs.org/rfcs/rfc5965.html
+# arf.py - Abstract classes for representing Abuse Reporting Format messages
+# Copyright (C) 2017 Dan Nielsen <dnielsen@fastmail.fm>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# -*- coding: utf-8 -*-
+""" arf.py - Abstract class for representing Abuse Reporting Format (ARF)
+    messages as defined in RFC5965.
+    http://www.faqs.org/rfcs/rfc5965.html
 """
+import json
 from email.parser import Parser
 from email.message import Message
 
-class ARF(object):
-	""" ARF abstract
-		@param arf_source - string representing the ARF source
-		@core - payload of the ARF message
-		@notification - the notification or 'friendly' portion of the ARF if any
-		@feedback_report - the required and option fb fields, see FeedbackReport
-		@original - the rfc822 headers of the original message or possibly
-			the complete message, represented as email.message
-	"""
-	def __init__(self, arf_source):
-		self.message = Parser().parsestr(arf_source)
-		self.core = self.message.get_payload()
-		self.notification = self.core[0].get_payload()
-		self.feedback_report = Parser(FeedbackReport).parsestr(
-			self.core[1].get_payload()[0].as_string())
-		self.original = self.core[2].get_payload()[0]
+class ARFMessage(object):
+    """ ARF abstract
+    """
+    def __init__(self, arf_source):
+        self._message = Parser().parsestr(arf_source)
+
+    def _header_to_camelcase(self, field):
+        def camelcase():
+            while True:
+                yield str.capitalize
+
+        c = camelcase()
+        return "".join(next(c)(x) for x in field.split("-"))
+
+    def _clean_field_value(self, field_value):
+        return field_value.replace("\n", "").replace("\t", " ")
+
+    def _serialize_headers(self, source_headers):
+        target_headers = {}
+
+        for (field, value) in source_headers:
+            clean_value = self._clean_field_value(value)
+            json_field = self._header_to_camelcase(field)
+
+            if json_field in target_headers:
+                if isinstance(target_headers[json_field], list):
+                    target_headers[json_field].append(clean_value)
+                else:
+                    target_headers[json_field] = [target_headers[json_field], 
+                        clean_value]
+            else:
+                target_headers[json_field] = clean_value
+        return target_headers
+
+    def get_message_headers(self):
+        """ Returns ARF message headers """
+        return self._message.items()
+
+    def get_descriptive_payload(self):
+        """ Returns the descriptive or 'friendly' part of the message """
+        return self._message.get_payload()[0].get_payload()
+
+    def get_feedback_report(self):
+        """ Returns the message/feedback-report part as a FeedbackReport """
+        return Parser(FeedbackReport).parsestr(
+            self._message.get_payload()[1].get_payload()[0].as_string())
+
+    def get_original_message_headers(self):
+        """ Returns headers from the orginal message """
+        return self._message.get_payload()[2].get_payload()[0].items()
+
+    def get_original_message_payload(self):
+        """ Returns the content of the original message """
+        return self._message.get_payload()[2].get_payload()[0].as_string()
+
+    def serialize_message_headers_to_json(self):
+        """ Returns the ARF message headers as a JSON string """
+        return json.dumps(self._serialize_headers(self.get_message_headers()))
+
+    def serialize_original_message_headers_to_json(self):
+        """ Returns the original message headers as a JSON string """
+        return json.dumps(self._serialize_headers(
+            self.get_original_message_headers()))
+
 
 class FeedbackReport(Message):
-	""" FeedbackReport - Convenience class with methods corresponding
-		to the required and optional ARF fields as defined in RFC5965
-	"""
-	def get_feedback_type(self):
-		return self.get('Feedback-Type')
-	def get_user_agent(self):
-		return self.get('User-Agent')
-	def get_version(self):
-		return self.get('Version')
-	def get_original_envelope_id(self):
-		return self.get('Original-Envelope-Id')
-	def get_original_mail_from(self):
-		return self.get('Original-Mail-From')
-	def get_arrival_date(self):
-		return self.get('Arrival-Date')
-	def get_reporting_mta(self):
-		return self.get('Reporting-MTA')
-	def get_source_ip(self):
-		return self.get('Source-IP')
-	def get_incidents(self):
-		return self.get('Incidents')
-	def get_authentication_results(self):
-		return self.get('Authentication-Results')
-	def get_original_rcpt_to(self):
-		return self.get('Original-Rcpt-To')
-	def get_reported_domain(self):
-		return self.get('Reported-Domain')
-	def get_reported_uri(self):
-		return self.get('Reported-URI')
+    """ FeedbackReport - Convenience class with methods corresponding
+        to the required and optional ARF fields as defined in RFC5965
+        for mime type feedback-report
+    """
+    def get_feedback_type(self):
+        return self.get('Feedback-Type')
+    def get_user_agent(self):
+        return self.get('User-Agent')
+    def get_version(self):
+        return self.get('Version')
+    def get_original_envelope_id(self):
+        return self.get('Original-Envelope-Id')
+    def get_original_mail_from(self):
+        return self.get('Original-Mail-From')
+    def get_arrival_date(self):
+        return self.get('Arrival-Date')
+    def get_reporting_mta(self):
+        return self.get('Reporting-MTA')
+    def get_source_ip(self):
+        return self.get('Source-IP')
+    def get_incidents(self):
+        return self.get('Incidents')
+    def get_authentication_results(self):
+        return self.get('Authentication-Results')
+    def get_original_rcpt_to(self):
+        return self.get('Original-Rcpt-To')
+    def get_reported_domain(self):
+        return self.get('Reported-Domain')
+    def get_reported_uri(self):
+        return self.get('Reported-URI')
 
-def process_arf(source_file):
-	f = open(source_file, 'r').read()
-	return ARF(f)
+def load_arf(source_file):
+    with open(source_file, 'r') as file_handle:
+        return ARFMessage(file_handle.read())
