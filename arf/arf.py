@@ -86,6 +86,17 @@ class ARFMessage(object):
         return json.dumps(self._serialize_headers(
             self.get_original_message_headers()))
 
+    def serialize_report_to_json(self):
+        """ Returns the message headers and feedback-report as a JSON string """
+        target = {}
+        target['MessageHeaders'] = self._serialize_headers(
+            self.get_message_headers())
+        target['OriginalMessageHeaders'] = self._serialize_headers(
+            self.get_original_message_headers())
+        target['FeedbackReport'] = self._serialize_headers(
+            self.get_feedback_report().items())
+        return json.dumps(target)
+
 
 class FeedbackReport(Message):
     """ FeedbackReport - Convenience class with methods corresponding
