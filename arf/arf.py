@@ -86,8 +86,7 @@ class ARFMessage(object):
         return json.dumps(self._serialize_headers(
             self.get_original_message_headers()))
 
-    def serialize_report_to_json(self):
-        """ Returns the message headers and feedback-report as a JSON string """
+    def serialize_report(self):
         target = {}
         target['MessageHeaders'] = self._serialize_headers(
             self.get_message_headers())
@@ -95,7 +94,11 @@ class ARFMessage(object):
             self.get_original_message_headers())
         target['FeedbackReport'] = self._serialize_headers(
             self.get_feedback_report().items())
-        return json.dumps(target)
+        return target
+
+    def serialize_report_to_json(self):
+        """ Returns the message headers and feedback-report as a JSON string """
+        return json.dumps(serialize_report)
 
 
 class FeedbackReport(Message):
