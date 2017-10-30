@@ -13,4 +13,4 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from arf import ARFMessage, FeedbackReport, process_arf
+from .arf import ARFMessage, FeedbackReport, load_arf

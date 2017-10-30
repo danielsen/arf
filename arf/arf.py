@@ -13,7 +13,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-# -*- coding: utf-8 -*-
+# -*- encoding: utf-8 -*-
 """ arf.py - Abstract class for representing Abuse Reporting Format (ARF)
     messages as defined in RFC5965.
     http://www.faqs.org/rfcs/rfc5965.html
