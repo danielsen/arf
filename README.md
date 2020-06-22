@@ -1,4 +1,4 @@
-arf provides simple abstract classes for representing and inspecting Abuse
+`arf-mime` provides simple abstract classes for representing and inspecting Abuse
 Reporting Format (ARF) messages as defined in 
 http://www.faqs.org/rfcs/rfc5965.html
 
@@ -8,19 +8,18 @@ There are two main classes included in this module; `ARFMessage` and
 
 ##### ARFMessage
 Objects derived from `ARFMessage` represent a full feedback report as defined
-in section 2 of [rfc5965](http://www.faqs.org/rfcs/rfc5965.html). Convenience
+in [Section 2 of RFC 5965](https://tools.ietf.org/html/rfc5965#section-2). Convenience
 methods are provided for accessing the various sub-parts of the full message.
 
 ##### FeedbackReport
 Objects derived from `FeedbackReport` represent the `message/feedback-report`
-part of the full message as defined in [rfc5965](http://www.faqs.org/rfcs/rfc5965.html). Convenience methods are provided to access the required and optional
+part of the full message as defined in [Section 3 of RFC 5965](https://tools.ietf.org/html/rfc5965#section-3). Convenience methods are provided to access the required and optional
 fields.
 
 ### Installation
-arf is provided as a distutils package. To install, clone the repository and
-run 
+`arf-mime` is provided through PyPi and can be install with `pip`. Run 
 
-    $ python setup.py install
+    $ pip install arf-mime
 
 ### Usage
 
@@ -32,8 +31,7 @@ or
     import arf
     arf.load_arf("/path/to/arf.file")
 
-### Testing
-To run package unit tests
+### Contributing and Reporting Issues
 
-    $ cd test
-    $ python arf_test.py
+Bug reports, feature requests, and contributions are all welcome. Please open issues ans PRs as
+needed. 

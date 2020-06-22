@@ -1,5 +1,5 @@
 # arf.py - Abstract classes for representing Abuse Reporting Format messages
-# Copyright (C) 2017 Dan Nielsen <dnielsen@fastmail.fm>
+# Copyright (C) 2020 Dan Nielsen <dnielsen@fastmail.fm>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
