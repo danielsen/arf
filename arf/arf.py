@@ -119,7 +119,7 @@ class ARFMessage(object):
 
     def serialize_report_to_json(self):
         """ Returns the message headers and feedback-report as a JSON string """
-        return json.dumps(serialize_report)
+        return json.dumps(self.serialize_report())
 
 
 class FeedbackReport(Message):
